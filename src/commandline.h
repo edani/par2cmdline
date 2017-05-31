@@ -43,7 +43,8 @@ public:
     opNone = 0,
     opCreate,        // Create new PAR2 recovery volumes
     opVerify,        // Verify but don't repair damaged data files
-    opRepair         // Verify and if possible repair damaged data files
+    opRepair,        // Verify and if possible repair damaged data files
+    opList           // List all PAR2 and target files
   } Operation;
 
   typedef enum
@@ -70,6 +71,13 @@ public:
     nlNoisy,        // Lots of output
     nlDebug         // Extra debugging information
   } NoiseLevel;
+
+  typedef enum
+  {
+    ltRecovery = (1 << 0), // List only recovery files
+    ltSource   = (1 << 1), // List only source files
+    ltBoth     = (ltRecovery | ltSource)  // List both recovery & source files
+  } ListType;
 
   // Any extra files listed on the command line
   class ExtraFile
@@ -106,6 +114,7 @@ public:
   u64                    GetLargestSourceSize(void) const  {return largestsourcesize;}
   u64                    GetTotalSourceSize(void) const    {return totalsourcesize;}
   CommandLine::NoiseLevel GetNoiseLevel(void) const        {return noiselevel;}
+  CommandLine::ListType  GetListType(void) const           {return listtype;};
 
   string                              GetParFilename(void) const {return parfilename;}
   string                              GetBasePath(void) const    {return basepath;}
@@ -121,6 +130,8 @@ protected:
   Version version;             // What version files will be processed.
 
   NoiseLevel noiselevel;       // How much display output should there be.
+
+  ListType listtype;           // Which file types to list
 
   u32 blockcount;              // How many blocks the source files should
                                // be virtually split into.

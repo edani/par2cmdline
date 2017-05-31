@@ -127,9 +127,11 @@ install-exec-hook :
 	ln -sf $(bindir)/par2$(EXEEXT) $(DESTDIR)$(bindir)/par2create$(EXEEXT)
 	ln -sf $(bindir)/par2$(EXEEXT) $(DESTDIR)$(bindir)/par2verify$(EXEEXT)
 	ln -sf $(bindir)/par2$(EXEEXT) $(DESTDIR)$(bindir)/par2repair$(EXEEXT)
+	ln -sf $(bindir)/par2$(EXEEXT) $(DESTDIR)$(bindir)/par2list$(EXEEXT)
 
 uninstall-hook :
 	rm -f $(DESTDIR)$(bindir)/par2create$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/par2verify$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/par2repair$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/par2list$(EXEEXT)
 

@@ -58,6 +58,7 @@ CommandLine::CommandLine(void)
 : operation(opNone)
 , version(verUnknown)
 , noiselevel(nlUnknown)
+, listtype(ltBoth)
 , blockcount(0)
 , blocksize(0)
 , firstblock(0)
@@ -113,6 +114,7 @@ void CommandLine::usage(void)
     "  par2 c(reate) [options] <PAR2 file> [files] : Create PAR2 files\n"
     "  par2 v(erify) [options] <PAR2 file> [files] : Verify files using PAR2 file\n"
     "  par2 r(epair) [options] <PAR2 file> [files] : Repair files using PAR2 files\n"
+    "  par2 l(ist)   [options] <par2 file> [files] : List contents of PAR2 files\n"
     "\n"
     "You may also leave out the \"c\", \"v\", and \"r\" commands by using \"par2create\",\n"
     "\"par2verify\", or \"par2repair\" instead.\n"
@@ -137,6 +139,8 @@ void CommandLine::usage(void)
   cout <<
     "  -v [-v]  : Be more verbose\n"
     "  -q [-q]  : Be more quiet (-q -q gives silence)\n"
+    "  -e       : List only recovery files\n"
+    "  -o       : List only source files\n"
     "  -p       : Purge backup files and par files on successful recovery or\n"
     "             when no recovery is needed\n"
     "  -R       : Recurse into subdirectories (only useful on create)\n"
@@ -211,6 +215,10 @@ bool CommandLine::Parse(int argc, char *argv[])
   {
     operation = opRepair;
   }
+  else if (0 == stricmp("par2list", name.c_str()))
+  {
+    operation = opList;
+  }
 
   // Have we determined what operation we want?
   if (operation == opNone)
@@ -234,6 +242,12 @@ bool CommandLine::Parse(int argc, char *argv[])
     case 'r':
       if (argv[0][1] == 0 || 0 == stricmp(argv[0], "repair"))
         operation = opRepair;
+      break;
+    case 'l':
+      if (argv[0][1] == 0 || 0 == stricmp(argv[0], "list"))
+      {
+        operation = opList;
+      }
       break;
     }
 
@@ -749,6 +763,18 @@ bool CommandLine::Parse(int argc, char *argv[])
           }
           break;
 
+        case 'e': // List only recovery files
+          {
+            listtype = ltRecovery;
+          }
+          break;
+
+        case 'o': // List only source files
+          {
+            listtype = ltSource;
+          }
+          break;
+
         case '-':
           {
             argc--;
@@ -889,7 +915,7 @@ bool CommandLine::Parse(int argc, char *argv[])
   // Default noise level
   if (noiselevel == nlUnknown)
   {
-    noiselevel = nlNormal;
+    noiselevel = (operation == opList ? nlSilent : nlNormal);
   }
 
   // Default skip leaway

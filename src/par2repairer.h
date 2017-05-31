@@ -27,6 +27,7 @@ public:
   ~Par2Repairer(void);
 
   Result Process(const CommandLine &commandline, bool dorepair);
+  Result List(const CommandLine &commandline);
 
 protected:
   // Steps in verifying and repairing files:

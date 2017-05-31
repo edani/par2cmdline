@@ -1122,3 +1122,19 @@ DiskFile* DiskFileMap::Find(string filename) const
 
   return (f != diskfilemap.end()) ?  f->second : 0;
 }
+
+void DiskFileMap::List(void)
+{
+  map<string, DiskFile*>::iterator fi = diskfilemap.begin();
+  while (fi != diskfilemap.end())
+  {
+    DiskFile *diskfile = (*fi).second;
+    string path;
+    string name;
+    DiskFile::SplitFilename(diskfile->FileName(), path, name);
+
+    cout << name << endl;
+
+    ++fi;
+  }
+}

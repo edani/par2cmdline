@@ -127,6 +127,7 @@ public:
   bool Insert(DiskFile *diskfile);
   void Remove(DiskFile *diskfile);
   DiskFile* Find(string filename) const;
+  void List();
 
 protected:
   map<string, DiskFile*>    diskfilemap;             // Map from filename to DiskFile

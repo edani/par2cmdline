@@ -101,6 +101,30 @@ int main(int argc, char *argv[])
           }
         }
         break;
+      case CommandLine::opList:
+        {
+          // List files inside par archives
+          switch (commandline->GetVersion())
+          {
+          case CommandLine::verPar1:
+            {
+              Par1Repairer *repairer = new Par1Repairer;
+              result = repairer->Process(*commandline, false);
+              delete repairer;
+            }
+           break;
+          case CommandLine::verPar2:
+            {
+              Par2Repairer *repairer = new Par2Repairer;
+              result = repairer->List(*commandline);
+              delete repairer;
+            }
+            break;
+          case CommandLine::opNone:
+            break;
+          }
+        }
+        break;
       case CommandLine::opNone:
         result = eSuccess;
         break;

@@ -270,6 +270,70 @@ Result Par2Repairer::Process(const CommandLine &commandline, bool dorepair)
   return eSuccess;
 }
 
+Result Par2Repairer::List(const CommandLine &commandline)
+{
+  // What noiselevel are we using
+  noiselevel = commandline.GetNoiseLevel();
+
+  // Get filesnames from the command line
+  string par2filename = commandline.GetParFilename();
+  DiskFile *par2DiskFile = new DiskFile();
+  par2DiskFile->Open(par2filename, 0);
+  par2DiskFile->Close();
+  diskFileMap.Insert(par2DiskFile);
+
+  const list<CommandLine::ExtraFile> &extrafiles = commandline.GetExtraFiles();
+
+  // Determine the searchpath from the location of the main PAR2 file
+  string name;
+  DiskFile::SplitFilename(par2filename, searchpath, name);
+
+  // Load packets from the main PAR2 file
+  if (!LoadPacketsFromFile(searchpath + name))
+    return eLogicError;
+
+  // Load packets from other PAR2 files with names based on the original PAR2 file
+  if (!LoadPacketsFromOtherFiles(par2filename))
+    return eLogicError;
+
+  // Load packets from any other PAR2 files whose names are given on the command line
+  if (!LoadPacketsFromExtraFiles(extrafiles))
+    return eLogicError;
+
+  // Check that the packets are consistent and discard any that are not
+  if (!CheckPacketConsistency())
+    return eInsufficientCriticalData;
+
+  // List all files in the recovery data map
+  if (commandline.GetListType() & CommandLine::ltRecovery)
+  {
+    diskFileMap.List();
+  }
+
+  // Use the information in the main packet to get the source files
+  // into the correct order and determine their filenames
+  if (!CreateSourceFileList())
+    return eLogicError;
+
+  // List all source (target) files found
+  if (commandline.GetListType() & CommandLine::ltSource)
+  {
+    vector<Par2RepairerSourceFile*>::iterator sf = sourcefiles.begin();
+    while (sf != sourcefiles.end())
+    {
+      Par2RepairerSourceFile *sourcefile = *sf;
+      if (sourcefile)
+      {
+        cout << sourcefile->GetDescriptionPacket()->FileName() << endl;
+      }
+      // iterate to next source file
+      ++sf; 
+    }
+  }
+
+  return eSuccess;
+}
+
 // Load the packets from the specified file
 bool Par2Repairer::LoadPacketsFromFile(string filename)
 {
